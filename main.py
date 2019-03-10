@@ -141,20 +141,29 @@ def VGG16(include_top=True, weights='imagenet',
                 convert_all_kernels_in_model(model)
     return model
 
+nb_class = 3
+hidden_dim = 512
+
+vgg_model = VGG16(include_top=False, input_shape=(224, 224, 3))
+last_layer = vgg_model.get_layer('pool5').output
+x = Flatten(name='flatten')(last_layer)
+x = Dense(hidden_dim, activation='relu', name='fc6')(x)
+x = Dense(hidden_dim, activation='relu', name='fc7')(x)
+out = Dense(nb_class, activation='softmax', name='fc8')(x)
+custom_vgg_model = Model(vgg_model.input, out)
 
 if __name__ == '__main__':
     model = VGG16(include_top=True, weights='imagenet')
 
-    img_path = 'elephant.jpg'
+    img_path = 'screwdriver.jpg'
     img = image.load_img(img_path, target_size=(224, 224))
     x = image.img_to_array(img)
     x = np.expand_dims(x, axis=0)
     x = preprocess_input(x)
     print('Input image shape:', x.shape)
 
-    preds = model.predict(x)
+    preds = custom_vgg_model.predict(x)
     print('Predicted:', decode_predictions(preds))
     
     
-    
-model = VGG16(include_top=True, weights='imagenet')
+   
