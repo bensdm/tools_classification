@@ -144,7 +144,7 @@ def VGG16(include_top=True, weights='imagenet',
 nb_class = 3
 hidden_dim = 512
 
-vgg_model = VGG16(include_top=False, input_shape=(224, 224, 3))
+vgg_model = VGG16(include_top=False, input_shape=(224, 224, 3), weights='imagenet')
 last_layer = vgg_model.get_layer('pool5').output
 x = Flatten(name='flatten')(last_layer)
 x = Dense(hidden_dim, activation='relu', name='fc6')(x)
@@ -153,7 +153,7 @@ out = Dense(nb_class, activation='softmax', name='fc8')(x)
 custom_vgg_model = Model(vgg_model.input, out)
 
 if __name__ == '__main__':
-    model = VGG16(include_top=True, weights='imagenet')
+    model = custom_vgg_model
 
     img_path = 'screwdriver.jpg'
     img = image.load_img(img_path, target_size=(224, 224))
@@ -162,7 +162,7 @@ if __name__ == '__main__':
     x = preprocess_input(x)
     print('Input image shape:', x.shape)
 
-    preds = custom_vgg_model.predict(x)
+    preds = model.predict(x)
     print('Predicted:', decode_predictions(preds))
     
     
